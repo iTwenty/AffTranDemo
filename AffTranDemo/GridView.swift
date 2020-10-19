@@ -40,8 +40,10 @@ class GridView: UIView {
                 UIColor.white.setStroke()
             } else if xUnit % 10 == 0 {
                 UIColor.cyan.setStroke()
-            } else {
+            } else if xUnit % 5 == 0 {
                 UIColor.gray.setStroke()
+            } else {
+                UIColor.gray.withAlphaComponent(0.6).setStroke()
             }
             let positiveX = Int(xCenter) + (xUnit * pointsPerUnit)
             let negativeX = Int(xCenter) - (xUnit * pointsPerUnit)
@@ -60,8 +62,10 @@ class GridView: UIView {
                 UIColor.white.setStroke()
             } else if yUnit % 10 == 0 {
                 UIColor.cyan.setStroke()
-            } else {
+            } else if yUnit % 5 == 0 {
                 UIColor.gray.setStroke()
+            } else {
+                UIColor.gray.withAlphaComponent(0.6).setStroke()
             }
             let positiveY = Int(yCenter) + (yUnit * pointsPerUnit)
             let negativeY = Int(yCenter) - (yUnit * pointsPerUnit)
