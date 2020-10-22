@@ -26,55 +26,42 @@ class GridView: UIView {
     }
 
     override func draw(_ rect: CGRect) {
-        drawGrid(width: rect.width, height: rect.height)
+        drawGridLines(axis: .horizontal, size: rect.width)
+        drawGridLines(axis: .vertical, size: rect.height)
     }
 
-    private func drawGrid(width: CGFloat, height: CGFloat) {
-        let xCenter = width / 2
-        let yCenter = height / 2
-        let xUnits = Int(width) / pointsPerUnit
-        let yUnits = Int(height) / pointsPerUnit
-
-        for xUnit in (0...xUnits / 2) {
-            if xUnit == 0 {
+    private func drawGridLines(axis: NSLayoutConstraint.Axis, size: CGFloat) {
+        let totalUnits = Int(size) / pointsPerUnit
+        for unit in (0...totalUnits / 2) {
+            if unit == 0 {
                 UIColor.white.setStroke()
-            } else if xUnit % 10 == 0 {
+            } else if unit % 10 == 0 {
                 UIColor.cyan.setStroke()
-            } else if xUnit % 5 == 0 {
+            } else if unit % 5 == 0 {
                 UIColor.gray.setStroke()
             } else {
                 UIColor.gray.withAlphaComponent(0.6).setStroke()
             }
-            let positiveX = Int(xCenter) + (xUnit * pointsPerUnit)
-            let negativeX = Int(xCenter) - (xUnit * pointsPerUnit)
+            let positive = Int(size / 2) + (unit * pointsPerUnit)
+            let negative = Int(size / 2) - (unit * pointsPerUnit)
             let path = UIBezierPath()
             path.lineWidth = 0.5
-            path.move(to: CGPoint(x: positiveX, y: 0))
-            path.addLine(to: CGPoint(x: positiveX, y: Int(height)))
-            path.move(to: CGPoint(x: negativeX, y: 0))
-            path.addLine(to: CGPoint(x: negativeX, y: Int(height)))
-            path.stroke()
-            path.close()
-        }
 
-        for yUnit in (0...yUnits / 2) {
-            if yUnit == 0 {
-                UIColor.white.setStroke()
-            } else if yUnit % 10 == 0 {
-                UIColor.cyan.setStroke()
-            } else if yUnit % 5 == 0 {
-                UIColor.gray.setStroke()
-            } else {
-                UIColor.gray.withAlphaComponent(0.6).setStroke()
+            switch axis {
+            case .horizontal:
+                path.move(to: CGPoint(x: positive, y: 0))
+                path.addLine(to: CGPoint(x: positive, y: Int(size)))
+                path.move(to: CGPoint(x: negative, y: 0))
+                path.addLine(to: CGPoint(x: negative, y: Int(size)))
+            case .vertical:
+                path.move(to: CGPoint(x: 0, y: positive))
+                path.addLine(to: CGPoint(x: Int(size), y: positive))
+                path.move(to: CGPoint(x: 0, y: negative))
+                path.addLine(to: CGPoint(x: Int(size), y: negative))
+            @unknown default:
+                break
             }
-            let positiveY = Int(yCenter) + (yUnit * pointsPerUnit)
-            let negativeY = Int(yCenter) - (yUnit * pointsPerUnit)
-            let path = UIBezierPath()
-            path.lineWidth = 0.5
-            path.move(to: CGPoint(x: 0, y: positiveY))
-            path.addLine(to: CGPoint(x: Int(width), y: positiveY))
-            path.move(to: CGPoint(x: 0, y: negativeY))
-            path.addLine(to: CGPoint(x: Int(width), y: negativeY))
+
             path.stroke()
             path.close()
         }

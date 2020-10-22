@@ -64,8 +64,8 @@ class ViewController: UIViewController {
             transformSlider.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor),
             transformSlider.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor),
             transformSlider.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
-            settingsButton.trailingAnchor.constraint(equalTo: gridScrollView.safeAreaLayoutGuide.trailingAnchor),
-            settingsButton.bottomAnchor.constraint(equalTo: gridScrollView.safeAreaLayoutGuide.bottomAnchor)
+            settingsButton.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor),
+            settingsButton.bottomAnchor.constraint(equalTo: transformSlider.safeAreaLayoutGuide.topAnchor)
         ])
     }
 
