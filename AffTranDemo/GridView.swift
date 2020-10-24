@@ -8,7 +8,7 @@
 import UIKit
 
 class GridView: UIView {
-    private let pointsPerUnit = 5
+    private let pointsPerUnit: CGFloat = 5
 
     required init?(coder: NSCoder) {
         super.init(coder: coder)
@@ -26,12 +26,15 @@ class GridView: UIView {
     }
 
     override func draw(_ rect: CGRect) {
-        drawGridLines(axis: .horizontal, size: rect.width)
-        drawGridLines(axis: .vertical, size: rect.height)
+        drawGridLines(axis: .horizontal, rect: rect)
+        drawGridLines(axis: .vertical, rect: rect)
+        drawIHat(rect)
+        drawJHat(rect)
     }
 
-    private func drawGridLines(axis: NSLayoutConstraint.Axis, size: CGFloat) {
-        let totalUnits = Int(size) / pointsPerUnit
+    private func drawGridLines(axis: NSLayoutConstraint.Axis, rect: CGRect) {
+        let size = axis == .horizontal ? rect.width : rect.height
+        let totalUnits = Int(size / pointsPerUnit)
         for unit in (0...totalUnits / 2) {
             if unit == 0 {
                 UIColor.white.setStroke()
@@ -42,22 +45,22 @@ class GridView: UIView {
             } else {
                 UIColor.gray.withAlphaComponent(0.6).setStroke()
             }
-            let positive = Int(size / 2) + (unit * pointsPerUnit)
-            let negative = Int(size / 2) - (unit * pointsPerUnit)
+            let positive = size / 2 + (CGFloat(unit) * pointsPerUnit)
+            let negative = size / 2 - (CGFloat(unit) * pointsPerUnit)
             let path = UIBezierPath()
             path.lineWidth = 0.5
 
             switch axis {
             case .horizontal:
                 path.move(to: CGPoint(x: positive, y: 0))
-                path.addLine(to: CGPoint(x: positive, y: Int(size)))
+                path.addLine(to: CGPoint(x: positive, y: size))
                 path.move(to: CGPoint(x: negative, y: 0))
-                path.addLine(to: CGPoint(x: negative, y: Int(size)))
+                path.addLine(to: CGPoint(x: negative, y: size))
             case .vertical:
                 path.move(to: CGPoint(x: 0, y: positive))
-                path.addLine(to: CGPoint(x: Int(size), y: positive))
+                path.addLine(to: CGPoint(x: size, y: positive))
                 path.move(to: CGPoint(x: 0, y: negative))
-                path.addLine(to: CGPoint(x: Int(size), y: negative))
+                path.addLine(to: CGPoint(x: size, y: negative))
             @unknown default:
                 break
             }
@@ -65,6 +68,36 @@ class GridView: UIView {
             path.stroke()
             path.close()
         }
+    }
+
+    private func drawIHat(_ rect: CGRect) {
+        let iHatStart = CGPoint(x: rect.width / 2, y: rect.height / 2)
+        let iHatEnd = CGPoint(x: rect.width / 2 + 10 * pointsPerUnit, y: rect.height / 2)
+        let path = UIBezierPath()
+        path.lineWidth = 2
+        UIColor.yellow.setStroke()
+        path.move(to: iHatStart)
+        path.addLine(to: iHatEnd)
+        path.addLine(to: CGPoint(x: iHatEnd.x - pointsPerUnit, y: iHatEnd.y - pointsPerUnit))
+        path.move(to: iHatEnd)
+        path.addLine(to: CGPoint(x: iHatEnd.x - pointsPerUnit, y: iHatEnd.y + pointsPerUnit))
+        path.stroke()
+        path.close()
+    }
+
+    private func drawJHat(_ rect: CGRect) {
+        let jHatStart = CGPoint(x: rect.width / 2, y: rect.height / 2)
+        let jHatEnd = CGPoint(x: rect.width / 2, y: rect.height / 2 + 10 * pointsPerUnit)
+        let path = UIBezierPath()
+        path.lineWidth = 2
+        UIColor.green.setStroke()
+        path.move(to: jHatStart)
+        path.addLine(to: jHatEnd)
+        path.addLine(to: CGPoint(x: jHatEnd.x + pointsPerUnit, y: jHatEnd.y - pointsPerUnit))
+        path.move(to: jHatEnd)
+        path.addLine(to: CGPoint(x: jHatEnd.x - pointsPerUnit, y: jHatEnd.y - pointsPerUnit))
+        path.stroke()
+        path.close()
     }
 
     override var intrinsicContentSize: CGSize {
