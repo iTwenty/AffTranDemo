@@ -9,7 +9,13 @@ import UIKit
 
 class ViewController: UIViewController {
 
-    lazy var gridView: GridView = {
+    lazy var bgGridView: GridView = {
+        let view = GridView()
+        view.translatesAutoresizingMaskIntoConstraints = false
+        return view
+    }()
+
+    lazy var fgGridView: GridView = {
         let view = GridView()
         view.translatesAutoresizingMaskIntoConstraints = false
         return view
@@ -42,7 +48,7 @@ class ViewController: UIViewController {
     }()
 
     lazy var animator = UIViewPropertyAnimator(duration: 1.0, curve: .linear) {
-        self.gridView.transform = CGAffineTransform(a: 0, b: 1, c: -1, d: 0, tx: 0, ty: 0)
+        self.bgGridView.transform = CGAffineTransform(a: 0, b: 1, c: -1, d: 0, tx: 0, ty: 0)
     }
 
     override func viewDidLoad() {
@@ -51,22 +57,32 @@ class ViewController: UIViewController {
         view.addSubview(gridScrollView)
         view.addSubview(settingsButton)
         view.addSubview(transformSlider)
-        gridScrollView.addSubview(gridView)
+        gridScrollView.addSubview(bgGridView)
+        gridScrollView.addSubview(fgGridView)
         NSLayoutConstraint.activate([
             gridScrollView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor),
             gridScrollView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
             gridScrollView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor),
             gridScrollView.bottomAnchor.constraint(equalTo: transformSlider.safeAreaLayoutGuide.topAnchor),
-            gridView.leadingAnchor.constraint(equalTo: gridScrollView.contentLayoutGuide.leadingAnchor),
-            gridView.topAnchor.constraint(equalTo: gridScrollView.contentLayoutGuide.topAnchor),
-            gridView.trailingAnchor.constraint(equalTo: gridScrollView.contentLayoutGuide.trailingAnchor),
-            gridView.bottomAnchor.constraint(equalTo: gridScrollView.contentLayoutGuide.bottomAnchor),
+            bgGridView.leadingAnchor.constraint(equalTo: gridScrollView.contentLayoutGuide.leadingAnchor),
+            bgGridView.topAnchor.constraint(equalTo: gridScrollView.contentLayoutGuide.topAnchor),
+            bgGridView.trailingAnchor.constraint(equalTo: gridScrollView.contentLayoutGuide.trailingAnchor),
+            bgGridView.bottomAnchor.constraint(equalTo: gridScrollView.contentLayoutGuide.bottomAnchor),
+            fgGridView.leadingAnchor.constraint(equalTo: bgGridView.leadingAnchor),
+            fgGridView.topAnchor.constraint(equalTo: bgGridView.topAnchor),
+            fgGridView.trailingAnchor.constraint(equalTo: bgGridView.trailingAnchor),
+            fgGridView.bottomAnchor.constraint(equalTo: bgGridView.bottomAnchor),
             transformSlider.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor),
             transformSlider.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor),
             transformSlider.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
             settingsButton.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor),
             settingsButton.bottomAnchor.constraint(equalTo: transformSlider.safeAreaLayoutGuide.topAnchor)
         ])
+        bgGridView.backgroundColor = .black
+        bgGridView.showTransformVectors = false
+        fgGridView.backgroundColor = .clear
+        fgGridView.showGridLines = false
+        fgGridView.showUnitVectors = false
     }
 
     override func viewDidAppear(_ animated: Bool) {
@@ -86,7 +102,7 @@ class ViewController: UIViewController {
     }
 
     @objc func didClickSettingsButton(_ button: UIButton) {
-        print(button.image(for: .normal)?.size ?? "")
+        print("Settings tapped")
     }
 }
 

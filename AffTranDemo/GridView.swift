@@ -8,7 +8,40 @@
 import UIKit
 
 class GridView: UIView {
-    private let pointsPerMm: CGFloat = 5
+    fileprivate static let pointsPerMm: CGFloat = 5
+
+    public var showUnitVectors: Bool = true {
+        didSet {
+            setNeedsDisplay()
+        }
+    }
+
+    public var showGridLines: Bool = true {
+        didSet {
+            setNeedsDisplay()
+        }
+    }
+
+    public var showTransformVectors: Bool = true {
+        didSet {
+            self.transformIHat.isHidden = !showTransformVectors
+            self.transformJHat.isHidden = !showTransformVectors
+            self.transformIHat.isUserInteractionEnabled = showTransformVectors
+            self.transformJHat.isUserInteractionEnabled = showTransformVectors        
+        }
+    }
+
+    private lazy var transformIHat: CrosshairView = {
+        let view = CrosshairView()
+        view.color = .yellow
+        return view
+    }()
+
+    private lazy var transformJHat: CrosshairView = {
+        let view = CrosshairView()
+        view.color = .green
+        return view
+    }()
 
     required init?(coder: NSCoder) {
         super.init(coder: coder)
@@ -23,18 +56,45 @@ class GridView: UIView {
     private func commonInit() {
         self.backgroundColor = .black
         self.contentMode = .redraw
+        self.addSubview(transformIHat)
+        self.addSubview(transformJHat)
     }
 
-    override func draw(_ rect: CGRect) {
-        drawGridLines(axis: .horizontal, rect: rect)
-        drawGridLines(axis: .vertical, rect: rect)
-        drawIHat(rect)
-        drawJHat(rect)
+    override func layoutSubviews() {
+        super.layoutSubviews()
+        let s = 3
+        transformIHat.frame = CGRect(x: self.bounds.midX + (10 - s).mm,
+                               y: self.bounds.midY - s.mm,
+                               width: 2 * s.mm, height: 2 * s.mm)
+        transformJHat.frame = CGRect(x: self.bounds.midX - s.mm,
+                               y: self.bounds.midY + (10 - s).mm,
+                               width: 2 * s.mm, height: 2 * s.mm)
     }
+
+    // MARK: UIView overridden methods
+
+    override func draw(_ rect: CGRect) {
+        if showGridLines {
+            drawGridLines(axis: .horizontal, rect: rect)
+            drawGridLines(axis: .vertical, rect: rect)
+        }
+        if showUnitVectors {
+            drawIHat(rect)
+            drawJHat(rect)
+        }
+    }
+
+    override var intrinsicContentSize: CGSize {
+        // Ideally we want to show 200 mm along both axes i.e -10cm to +10cm
+        let totalSize = 200.mm
+        return CGSize(width: totalSize, height: totalSize)
+    }
+
+    // MARK: Private drawing methods
 
     private func drawGridLines(axis: NSLayoutConstraint.Axis, rect: CGRect) {
         let size = axis == .horizontal ? rect.width : rect.height
-        let totalUnits = Int(size / pointsPerMm)
+        let totalUnits = Int(size / GridView.pointsPerMm)
         for unit in (0...totalUnits / 2) {
             if unit == 0 {
                 UIColor.white.setStroke()
@@ -45,8 +105,8 @@ class GridView: UIView {
             } else {
                 UIColor.gray.withAlphaComponent(0.6).setStroke()
             }
-            let positive = size / 2 + (CGFloat(unit) * pointsPerMm)
-            let negative = size / 2 - (CGFloat(unit) * pointsPerMm)
+            let positive = size / 2 + unit.mm
+            let negative = size / 2 - unit.mm
             let path = UIBezierPath()
             path.lineWidth = 0.5
 
@@ -71,38 +131,38 @@ class GridView: UIView {
     }
 
     private func drawIHat(_ rect: CGRect) {
-        let iHatStart = CGPoint(x: rect.width / 2, y: rect.height / 2)
-        let iHatEnd = CGPoint(x: rect.width / 2 + 10 * pointsPerMm, y: rect.height / 2)
+        let iHatStart = CGPoint(x: rect.midX, y: rect.midY)
+        let iHatEnd = CGPoint(x: rect.midX + 10.mm, y: rect.midY)
         let path = UIBezierPath()
         path.lineWidth = 2
         UIColor.yellow.setStroke()
         path.move(to: iHatStart)
         path.addLine(to: iHatEnd)
-        path.addLine(to: CGPoint(x: iHatEnd.x - pointsPerMm, y: iHatEnd.y - pointsPerMm))
+        path.addLine(to: CGPoint(x: iHatEnd.x - 1.mm, y: iHatEnd.y - 1.mm))
         path.move(to: iHatEnd)
-        path.addLine(to: CGPoint(x: iHatEnd.x - pointsPerMm, y: iHatEnd.y + pointsPerMm))
+        path.addLine(to: CGPoint(x: iHatEnd.x - 1.mm, y: iHatEnd.y + 1.mm))
         path.stroke()
         path.close()
     }
 
     private func drawJHat(_ rect: CGRect) {
-        let jHatStart = CGPoint(x: rect.width / 2, y: rect.height / 2)
-        let jHatEnd = CGPoint(x: rect.width / 2, y: rect.height / 2 + 10 * pointsPerMm)
+        let jHatStart = CGPoint(x: rect.midX, y: rect.midY)
+        let jHatEnd = CGPoint(x: rect.midX, y: rect.midY + 10.mm)
         let path = UIBezierPath()
         path.lineWidth = 2
         UIColor.green.setStroke()
         path.move(to: jHatStart)
         path.addLine(to: jHatEnd)
-        path.addLine(to: CGPoint(x: jHatEnd.x + pointsPerMm, y: jHatEnd.y - pointsPerMm))
+        path.addLine(to: CGPoint(x: jHatEnd.x + 1.mm, y: jHatEnd.y - 1.mm))
         path.move(to: jHatEnd)
-        path.addLine(to: CGPoint(x: jHatEnd.x - pointsPerMm, y: jHatEnd.y - pointsPerMm))
+        path.addLine(to: CGPoint(x: jHatEnd.x - 1.mm, y: jHatEnd.y - 1.mm))
         path.stroke()
         path.close()
     }
+}
 
-    override var intrinsicContentSize: CGSize {
-        // Ideally we want to show 200 units along both axes i.e -10 to +10
-        let totalPoints = 200 * pointsPerMm
-        return CGSize(width: totalPoints, height: totalPoints)
+fileprivate extension Int {
+    var mm: CGFloat {
+        CGFloat(self) * GridView.pointsPerMm
     }
 }

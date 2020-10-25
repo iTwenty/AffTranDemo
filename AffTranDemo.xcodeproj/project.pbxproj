@@ -12,6 +12,7 @@
 		6395B43B253970800002E802 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 6395B43A253970800002E802 /* Assets.xcassets */; };
 		6395B43E253970800002E802 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 6395B43C253970800002E802 /* LaunchScreen.storyboard */; };
 		6395B447253971A20002E802 /* GridView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6395B446253971A20002E802 /* GridView.swift */; };
+		63CF072D2544723700041C72 /* CrosshairView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63CF072C2544723700041C72 /* CrosshairView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -22,6 +23,7 @@
 		6395B43D253970800002E802 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		6395B43F253970800002E802 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		6395B446253971A20002E802 /* GridView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GridView.swift; sourceTree = "<group>"; };
+		63CF072C2544723700041C72 /* CrosshairView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CrosshairView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -57,6 +59,7 @@
 				6395B4312539707F0002E802 /* AppDelegate.swift */,
 				6395B4352539707F0002E802 /* ViewController.swift */,
 				6395B446253971A20002E802 /* GridView.swift */,
+				63CF072C2544723700041C72 /* CrosshairView.swift */,
 				6395B43A253970800002E802 /* Assets.xcassets */,
 				6395B43C253970800002E802 /* LaunchScreen.storyboard */,
 				6395B43F253970800002E802 /* Info.plist */,
@@ -136,6 +139,7 @@
 				6395B4362539707F0002E802 /* ViewController.swift in Sources */,
 				6395B4322539707F0002E802 /* AppDelegate.swift in Sources */,
 				6395B447253971A20002E802 /* GridView.swift in Sources */,
+				63CF072D2544723700041C72 /* CrosshairView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
