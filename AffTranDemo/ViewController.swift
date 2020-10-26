@@ -9,6 +9,8 @@ import UIKit
 
 class ViewController: UIViewController {
 
+    var animator: UIViewPropertyAnimator?
+
     lazy var bgGridView: GridView = {
         let view = GridView()
         view.translatesAutoresizingMaskIntoConstraints = false
@@ -19,7 +21,18 @@ class ViewController: UIViewController {
         let view = GridView()
         view.translatesAutoresizingMaskIntoConstraints = false
         view.transformVectorsAction = { (iHatPosition: CGPoint, jHatPosition: CGPoint) in
-            print("x : \(iHatPosition) y : \(jHatPosition)")
+            let transform = CGAffineTransform(a: iHatPosition.x, b: iHatPosition.y,
+                                              c: jHatPosition.x, d: jHatPosition.y,
+                                              tx: 0, ty: 0)
+            let currentAnimFraction = self.animator?.fractionComplete ?? 0
+            self.animator?.fractionComplete = 0
+            self.animator?.stopAnimation(false)
+            self.animator?.finishAnimation(at: .current)
+            self.bgGridView.transform = .identity
+            self.animator = UIViewPropertyAnimator(duration: 1.0, curve: .linear) {
+                self.bgGridView.transform = transform
+            }
+            self.animator?.fractionComplete = currentAnimFraction
         }
         return view
     }()
@@ -49,10 +62,6 @@ class ViewController: UIViewController {
         button.addTarget(self, action: #selector(didClickSettingsButton(_:)), for: .touchUpInside)
         return button
     }()
-
-    lazy var animator = UIViewPropertyAnimator(duration: 1.0, curve: .linear) {
-        self.bgGridView.transform = CGAffineTransform(a: 0, b: 1, c: -1, d: 0, tx: 0, ty: 0)
-    }
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -97,6 +106,7 @@ class ViewController: UIViewController {
     }
 
     @objc func transformSliderValueDidChange(_ slider: UISlider) {
+        guard let animator = self.animator else { return }
         if animator.state != .active {
             animator.startAnimation()
             animator.pauseAnimation()
