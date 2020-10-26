@@ -18,6 +18,9 @@ class ViewController: UIViewController {
     lazy var fgGridView: GridView = {
         let view = GridView()
         view.translatesAutoresizingMaskIntoConstraints = false
+        view.transformVectorsAction = { (iHatPosition: CGPoint, jHatPosition: CGPoint) in
+            print("x : \(iHatPosition) y : \(jHatPosition)")
+        }
         return view
     }()
 

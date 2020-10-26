@@ -31,6 +31,18 @@ class GridView: UIView {
         }
     }
 
+    public var transformVectorsAction: ((_ iHatPosition: CGPoint, _ jHatPosition: CGPoint) -> Void)?
+
+    private lazy var iHatPan: UIPanGestureRecognizer = {
+        let pangr = UIPanGestureRecognizer(target: self, action: #selector(didPan(_:)))
+        return pangr
+    }()
+
+    private lazy var jHatPan: UIPanGestureRecognizer = {
+        let pangr = UIPanGestureRecognizer(target: self, action: #selector(didPan(_:)))
+        return pangr
+    }()
+
     private lazy var transformIHat: CrosshairView = {
         let view = CrosshairView()
         view.color = .yellow
@@ -58,6 +70,8 @@ class GridView: UIView {
         self.contentMode = .redraw
         self.addSubview(transformIHat)
         self.addSubview(transformJHat)
+        transformIHat.addGestureRecognizer(iHatPan)
+        transformJHat.addGestureRecognizer(jHatPan)
     }
 
     override func layoutSubviews() {
@@ -158,6 +172,20 @@ class GridView: UIView {
         path.addLine(to: CGPoint(x: jHatEnd.x - 1.mm, y: jHatEnd.y - 1.mm))
         path.stroke()
         path.close()
+    }
+
+    @objc private func didPan(_ pangr: UIPanGestureRecognizer) {
+        guard pangr.view == transformIHat || pangr.view == transformJHat else { return }
+        if pangr.state == .changed {
+            pangr.view?.center = pangr.location(in: self)
+        }
+        if pangr.state == .ended {
+            let transformIHatPosition = CGPoint(x: (transformIHat.center.x - self.bounds.midX) / (GridView.pointsPerMm * 10),
+                                                y: (transformIHat.center.y - self.bounds.midY) / (GridView.pointsPerMm * 10))
+            let transformJHatPosition = CGPoint(x: (transformJHat.center.x - self.bounds.midX) / (GridView.pointsPerMm * 10),
+                                                y: (transformJHat.center.y - self.bounds.midY) / (GridView.pointsPerMm * 10))
+            transformVectorsAction?(transformIHatPosition, transformJHatPosition)
+        }
     }
 }
 
