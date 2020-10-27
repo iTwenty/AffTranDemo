@@ -8,7 +8,7 @@
 import UIKit
 
 class CrosshairView: UIView {
-    private var circleWidth: CGFloat = 2
+    private var circleWidth: CGFloat = 1
 
     public var color: UIColor = .blue {
         didSet {

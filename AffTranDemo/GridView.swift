@@ -76,7 +76,7 @@ class GridView: UIView {
 
     override func layoutSubviews() {
         super.layoutSubviews()
-        let s = 3
+        let s = 2
         transformIHat.frame = CGRect(x: self.bounds.midX + (10 - s).mm,
                                y: self.bounds.midY - s.mm,
                                width: 2 * s.mm, height: 2 * s.mm)
@@ -148,7 +148,7 @@ class GridView: UIView {
         let iHatStart = CGPoint(x: rect.midX, y: rect.midY)
         let iHatEnd = CGPoint(x: rect.midX + 10.mm, y: rect.midY)
         let path = UIBezierPath()
-        path.lineWidth = 2
+        path.lineWidth = 1
         UIColor.yellow.setStroke()
         path.move(to: iHatStart)
         path.addLine(to: iHatEnd)
@@ -163,7 +163,7 @@ class GridView: UIView {
         let jHatStart = CGPoint(x: rect.midX, y: rect.midY)
         let jHatEnd = CGPoint(x: rect.midX, y: rect.midY + 10.mm)
         let path = UIBezierPath()
-        path.lineWidth = 2
+        path.lineWidth = 1
         UIColor.green.setStroke()
         path.move(to: jHatStart)
         path.addLine(to: jHatEnd)
