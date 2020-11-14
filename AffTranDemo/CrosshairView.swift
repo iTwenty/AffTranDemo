@@ -31,10 +31,12 @@ class CrosshairView: UIView {
     }
 
     override func draw(_ rect: CGRect) {
-        let radius = ((rect.width > rect.height) ? rect.midY : rect.midX) - circleWidth
         let center = CGPoint(x: rect.midX, y: rect.midY)
-        let path = UIBezierPath(arcCenter: center, radius: radius, startAngle: 0,
-                                endAngle: CGFloat(2 * Double.pi), clockwise: true)
+        let path = UIBezierPath()
+        path.move(to: CGPoint(x: 0, y: center.y))
+        path.addLine(to: CGPoint(x: rect.width, y: center.y))
+        path.move(to: CGPoint(x: center.x, y: 0))
+        path.addLine(to: CGPoint(x: center.x, y: rect.height))
         path.lineWidth = circleWidth
         color.setStroke()
         path.stroke()

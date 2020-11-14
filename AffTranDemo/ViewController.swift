@@ -14,16 +14,21 @@ class ViewController: UIViewController {
     lazy var bgGridView: GridView = {
         let view = GridView()
         view.translatesAutoresizingMaskIntoConstraints = false
+        view.backgroundColor = .black
+        view.showTransformCrosshairs = false
         return view
     }()
 
     lazy var fgGridView: GridView = {
         let view = GridView()
         view.translatesAutoresizingMaskIntoConstraints = false
-        view.transformVectorsAction = { (iHatPosition: CGPoint, jHatPosition: CGPoint) in
+        view.backgroundColor = .clear
+        view.showGridLines = false
+        view.showUnitVectors = false
+        view.transformAction = { (iHatPosition: CGPoint, jHatPosition: CGPoint, originPosition: CGPoint) in
             let transform = CGAffineTransform(a: iHatPosition.x, b: iHatPosition.y,
                                               c: jHatPosition.x, d: jHatPosition.y,
-                                              tx: 0, ty: 0)
+                                              tx: originPosition.x, ty: originPosition.y)
             let currentAnimFraction = self.animator?.fractionComplete ?? 0
             self.animator?.fractionComplete = 0
             self.animator?.stopAnimation(false)
@@ -54,12 +59,21 @@ class ViewController: UIViewController {
         return slider
     }()
 
-    lazy var settingsButton: UIButton = {
+    lazy var playButton: UIButton = {
         let button = UIButton(type: .custom)
         button.translatesAutoresizingMaskIntoConstraints = false
         button.backgroundColor = UIColor.black.withAlphaComponent(0.7)
-        button.setImage(UIImage(systemName: "gearshape"), for: .normal)
-        button.addTarget(self, action: #selector(didClickSettingsButton(_:)), for: .touchUpInside)
+        button.setImage(UIImage(systemName: "play.fill"), for: .normal)
+        button.addTarget(self, action: #selector(didClickPlayButton(_:)), for: .touchUpInside)
+        return button
+    }()
+
+    lazy var resetButton: UIButton = {
+        let button = UIButton(type: .custom)
+        button.translatesAutoresizingMaskIntoConstraints = false
+        button.backgroundColor = UIColor.black.withAlphaComponent(0.7)
+        button.setImage(UIImage(systemName: "xmark.circle.fill"), for: .normal)
+        button.addTarget(self, action: #selector(didClickResetButton(_:)), for: .touchUpInside)
         return button
     }()
 
@@ -67,7 +81,8 @@ class ViewController: UIViewController {
         super.viewDidLoad()
         view.backgroundColor = .black
         view.addSubview(gridScrollView)
-        view.addSubview(settingsButton)
+        view.addSubview(playButton)
+        view.addSubview(resetButton)
         view.addSubview(transformSlider)
         gridScrollView.addSubview(bgGridView)
         gridScrollView.addSubview(fgGridView)
@@ -87,14 +102,11 @@ class ViewController: UIViewController {
             transformSlider.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor),
             transformSlider.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor),
             transformSlider.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
-            settingsButton.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor),
-            settingsButton.bottomAnchor.constraint(equalTo: transformSlider.safeAreaLayoutGuide.topAnchor)
+            playButton.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor),
+            playButton.bottomAnchor.constraint(equalTo: transformSlider.safeAreaLayoutGuide.topAnchor),
+            resetButton.trailingAnchor.constraint(equalTo: playButton.leadingAnchor),
+            resetButton.bottomAnchor.constraint(equalTo: playButton.bottomAnchor)
         ])
-        bgGridView.backgroundColor = .black
-        bgGridView.showTransformVectors = false
-        fgGridView.backgroundColor = .clear
-        fgGridView.showGridLines = false
-        fgGridView.showUnitVectors = false
     }
 
     override func viewDidAppear(_ animated: Bool) {
@@ -114,8 +126,19 @@ class ViewController: UIViewController {
         animator.fractionComplete = CGFloat(slider.value)
     }
 
-    @objc func didClickSettingsButton(_ button: UIButton) {
-        print("Settings tapped")
+    @objc func didClickPlayButton(_ button: UIButton) {
+        Timer.scheduledTimer(withTimeInterval: 0.02, repeats: true) { [self] (timer) in
+            transformSlider.setValue(transformSlider.value + Float(timer.timeInterval), animated: false)
+            transformSliderValueDidChange(transformSlider)
+            if transformSlider.value >= transformSlider.maximumValue {
+                timer.invalidate()
+            }
+        }
+    }
+
+    @objc func didClickResetButton(_ button: UIButton) {
+        transformSlider.setValue(0, animated: false)
+        transformSliderValueDidChange(transformSlider)
     }
 }
 

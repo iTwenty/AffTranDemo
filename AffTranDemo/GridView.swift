@@ -22,16 +22,18 @@ class GridView: UIView {
         }
     }
 
-    public var showTransformVectors: Bool = true {
+    public var showTransformCrosshairs: Bool = true {
         didSet {
-            self.transformIHat.isHidden = !showTransformVectors
-            self.transformJHat.isHidden = !showTransformVectors
-            self.transformIHat.isUserInteractionEnabled = showTransformVectors
-            self.transformJHat.isUserInteractionEnabled = showTransformVectors        
+            self.transformIHat.isHidden = !showTransformCrosshairs
+            self.transformJHat.isHidden = !showTransformCrosshairs
+            self.transformOrigin.isHidden = !showTransformCrosshairs
+            self.transformIHat.isUserInteractionEnabled = showTransformCrosshairs
+            self.transformJHat.isUserInteractionEnabled = showTransformCrosshairs
+            self.transformOrigin.isUserInteractionEnabled = showTransformCrosshairs
         }
     }
 
-    public var transformVectorsAction: ((_ iHatPosition: CGPoint, _ jHatPosition: CGPoint) -> Void)?
+    public var transformAction: ((_ iHatPosition: CGPoint, _ jHatPosition: CGPoint, _ originPosition: CGPoint) -> Void)?
 
     private lazy var iHatPan: UIPanGestureRecognizer = {
         let pangr = UIPanGestureRecognizer(target: self, action: #selector(didPan(_:)))
@@ -39,6 +41,11 @@ class GridView: UIView {
     }()
 
     private lazy var jHatPan: UIPanGestureRecognizer = {
+        let pangr = UIPanGestureRecognizer(target: self, action: #selector(didPan(_:)))
+        return pangr
+    }()
+
+    private lazy var originPan: UIPanGestureRecognizer = {
         let pangr = UIPanGestureRecognizer(target: self, action: #selector(didPan(_:)))
         return pangr
     }()
@@ -52,6 +59,12 @@ class GridView: UIView {
     private lazy var transformJHat: CrosshairView = {
         let view = CrosshairView()
         view.color = .green
+        return view
+    }()
+
+    private lazy var transformOrigin: CrosshairView = {
+        let view = CrosshairView()
+        view.color = .red
         return view
     }()
 
@@ -70,19 +83,24 @@ class GridView: UIView {
         self.contentMode = .redraw
         self.addSubview(transformIHat)
         self.addSubview(transformJHat)
+        self.addSubview(transformOrigin)
         transformIHat.addGestureRecognizer(iHatPan)
         transformJHat.addGestureRecognizer(jHatPan)
+        transformOrigin.addGestureRecognizer(originPan)
     }
 
     override func layoutSubviews() {
         super.layoutSubviews()
-        let s = 2
+        let s = 1
         transformIHat.frame = CGRect(x: self.bounds.midX + (10 - s).mm,
-                               y: self.bounds.midY - s.mm,
-                               width: 2 * s.mm, height: 2 * s.mm)
+                                     y: self.bounds.midY - s.mm,
+                                     width: 2 * s.mm, height: 2 * s.mm)
         transformJHat.frame = CGRect(x: self.bounds.midX - s.mm,
-                               y: self.bounds.midY + (10 - s).mm,
-                               width: 2 * s.mm, height: 2 * s.mm)
+                                     y: self.bounds.midY + (10 - s).mm,
+                                     width: 2 * s.mm, height: 2 * s.mm)
+        transformOrigin.frame = CGRect(x: self.bounds.midX - s.mm,
+                                       y: self.bounds.midY - s.mm,
+                                       width: 2 * s.mm, height: 2 * s.mm)
     }
 
     // MARK: UIView overridden methods
@@ -175,7 +193,9 @@ class GridView: UIView {
     }
 
     @objc private func didPan(_ pangr: UIPanGestureRecognizer) {
-        guard pangr.view == transformIHat || pangr.view == transformJHat else { return }
+        guard pangr.view == transformIHat ||
+                pangr.view == transformJHat ||
+                pangr.view == transformOrigin else { return }
         if pangr.state == .changed {
             pangr.view?.center = pangr.location(in: self)
         }
@@ -184,7 +204,9 @@ class GridView: UIView {
                                                 y: (transformIHat.center.y - self.bounds.midY) / (GridView.pointsPerMm * 10))
             let transformJHatPosition = CGPoint(x: (transformJHat.center.x - self.bounds.midX) / (GridView.pointsPerMm * 10),
                                                 y: (transformJHat.center.y - self.bounds.midY) / (GridView.pointsPerMm * 10))
-            transformVectorsAction?(transformIHatPosition, transformJHatPosition)
+            let transformOriginPosition = CGPoint(x: (transformOrigin.center.x - self.bounds.midX),
+                                                  y: (transformOrigin.center.y - self.bounds.midY))
+            transformAction?(transformIHatPosition, transformJHatPosition, transformOriginPosition)
         }
     }
 }
