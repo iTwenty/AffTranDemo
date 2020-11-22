@@ -68,6 +68,8 @@ class GridView: UIView {
         return view
     }()
 
+    private var transformOriginPreDragCenter: CGPoint?
+
     required init?(coder: NSCoder) {
         super.init(coder: coder)
         commonInit()
@@ -196,14 +198,24 @@ class GridView: UIView {
         guard pangr.view == transformIHat ||
                 pangr.view == transformJHat ||
                 pangr.view == transformOrigin else { return }
+        if pangr.state == .began, pangr.view == transformOrigin {
+            transformOriginPreDragCenter = transformOrigin.center
+        }
         if pangr.state == .changed {
             pangr.view?.center = pangr.location(in: self)
         }
         if pangr.state == .ended {
-            let transformIHatPosition = CGPoint(x: (transformIHat.center.x - self.bounds.midX) / (GridView.pointsPerMm * 10),
-                                                y: (transformIHat.center.y - self.bounds.midY) / (GridView.pointsPerMm * 10))
-            let transformJHatPosition = CGPoint(x: (transformJHat.center.x - self.bounds.midX) / (GridView.pointsPerMm * 10),
-                                                y: (transformJHat.center.y - self.bounds.midY) / (GridView.pointsPerMm * 10))
+            if let preDragCenter = transformOriginPreDragCenter {
+                transformIHat.center = CGPoint(x: transformIHat.center.x + (transformOrigin.center.x - preDragCenter.x),
+                                               y: transformIHat.center.y + (transformOrigin.center.y - preDragCenter.y))
+                transformJHat.center = CGPoint(x: transformJHat.center.x + (transformOrigin.center.x - preDragCenter.x),
+                                               y: transformJHat.center.y + (transformOrigin.center.y - preDragCenter.y))
+            }
+            transformOriginPreDragCenter = nil
+            let transformIHatPosition = CGPoint(x: (transformIHat.center.x - self.transformOrigin.center.x) / (GridView.pointsPerMm * 10),
+                                                y: (transformIHat.center.y - self.transformOrigin.center.y) / (GridView.pointsPerMm * 10))
+            let transformJHatPosition = CGPoint(x: (transformJHat.center.x - self.transformOrigin.center.x) / (GridView.pointsPerMm * 10),
+                                                y: (transformJHat.center.y - self.transformOrigin.center.y) / (GridView.pointsPerMm * 10))
             let transformOriginPosition = CGPoint(x: (transformOrigin.center.x - self.bounds.midX),
                                                   y: (transformOrigin.center.y - self.bounds.midY))
             transformAction?(transformIHatPosition, transformJHatPosition, transformOriginPosition)

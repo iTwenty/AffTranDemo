@@ -7,6 +7,5 @@ iOS app for playing around with affine transforms.
 - Clear button next to it sets slider to zero, resetting the transform.
 
 ### TODO
-- Modifying both origin and unit vectors together results in weird behaviour
 - Snap to grid for draggable crosshairs
 - Labelling of axes, info on current crosshair values etc
